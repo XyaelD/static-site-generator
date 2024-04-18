@@ -1,8 +1,13 @@
 import os
 import shutil
+from generate_html import generate_pages_recursive
 
 source_path = "./static"
 dest_path = "./public"
+
+dir_path_content = "./content"
+template_path = "template.html"
+dest_dir_path = "./public"
 
 def copy_static(path):
     if os.path.exists(path):
@@ -25,7 +30,8 @@ def delete_destination_directory(path):
     os.mkdir(path)
 
 def main():
-    delete_destination_directory(dest_path)
-    copy_static(source_path)
-
+    # delete_destination_directory(dest_path)
+    # copy_static(source_path)
+    # dest = "public/index.html"
+    generate_pages_recursive(dir_path_content, template_path, dest_dir_path)
 main()

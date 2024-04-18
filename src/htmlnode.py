@@ -14,8 +14,8 @@ class HTMLNode:
             for k, v in self.props.items():
                 converted += f" {k}=\"{v}\""
             return converted
+        return ""
                 
-        
     def __repr__(self):
         return f"HTMLNode({self.tag}, {self.value}, {self.children}, {self.props})"
     
@@ -56,3 +56,6 @@ class ParentNode(HTMLNode):
                 result += child.to_html()
         result += f"</{self.tag}>"
         return result
+    
+    def __repr__(self):
+        return f"ParentNode({self.tag}, children: {self.children}, {self.props})"    

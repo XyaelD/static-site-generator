@@ -1,5 +1,5 @@
 from htmlnode import ParentNode, LeafNode
-from textnode import TextNode, text_to_textnodes, text_node_to_html_node
+from textnode import LeafNode, TextNode, text_to_textnodes, text_node_to_html_node
 
 block_type_paragraph = "paragraph"
 block_type_heading = "heading"
@@ -65,53 +65,64 @@ def block_to_block_type(block):
     
     return block_type_paragraph
 
-# Likely need to replace \n with <br> for html parsing                
+# Likely need to replace \n with <br> for html parsing
+def text_to_children(text):
+    text_nodes = text_to_textnodes(text)
+    children = []
+    for text_node in text_nodes:
+        html_node = text_node_to_html_node(text_node)
+        children.append(html_node)
+    return children
+                
 def paragraph_to_html_node(block):
-    cleaned_block = block.replace("\n", "<br>")
-    text_nodes = text_to_textnodes(cleaned_block)
-    children = list(map(text_node_to_html_node, text_nodes))
+    lines = block.split("\n")
+    paragraph = " ".join(lines)
+    children = text_to_children(paragraph)
     parent_node = ParentNode(tag="p", children=children)
     return parent_node
 
 def heading_to_html_node(block):
     hash_count = block.count("#")
     cleaned_block = block.replace("#", "").strip()
-    text_nodes = text_to_textnodes(cleaned_block)
-    children = list(map(text_node_to_html_node, text_nodes))
+    children = text_to_children(cleaned_block)
     parent_node = ParentNode(tag=f"h{hash_count}", children=children)
     return parent_node
 
 def quote_to_html_node(block):
-    cleaned_block = block.replace(">", "").replace("\n", "<br>")
-    text_nodes = text_to_textnodes(cleaned_block)
-    children = list(map(text_node_to_html_node, text_nodes))
+    lines = block.split("\n")
+    new_lines = []
+    for line in lines:
+        new_lines.append(line.replace("> ", ""))
+    content = " ".join(new_lines)
+    children = text_to_children(content)
     parent_node = ParentNode(tag="blockquote", children=children)
     return parent_node
 
 def code_to_html_node(block):
-    cleaned_block = block.replace("`", "").replace("\n", "<br>")
-    text_nodes = text_to_textnodes(cleaned_block)
-    children = list(map(text_node_to_html_node, text_nodes))
+    cleaned_block = block.replace("`", "")
+    children = text_to_children(cleaned_block)
     code_node = ParentNode(tag="code", children=children)
-    parent_node = ParentNode(tag="pre", children=code_node)
+    parent_node = ParentNode(tag="pre", children=[code_node])
     return parent_node
 
 def ordered_list_to_html_node(block):
     split_list = block.split("\n")
-    readied_list = list(map(lambda x: "<li>" + x[2:] + "</li>", split_list))
-    readied_string = "".join(readied_list)
-    text_nodes = text_to_textnodes(readied_string)
-    children = list(map(text_node_to_html_node, text_nodes))
-    parent_node = ParentNode(tag="ol", children=children)
+    readied_list = list(map(lambda x: x[2:].strip(), split_list))
+    list_items = []
+    for item in readied_list:
+        children = text_to_children(item)
+        list_items.append(ParentNode("li", children))
+    parent_node = ParentNode(tag="ol", children=list_items)
     return parent_node
 
 def unordered_list__to_html_node(block):
     split_list = block.split("\n")
-    readied_list = list(map(lambda x: "<li>" + x[1:] + "</li>", split_list))
-    readied_string = "".join(readied_list)
-    text_nodes = text_to_textnodes(readied_string)
-    children = list(map(text_node_to_html_node, text_nodes))
-    parent_node = ParentNode(tag="ol", children=children)
+    readied_list = list(map(lambda x: x[1:].strip(), split_list))
+    list_items = []
+    for item in readied_list:
+        children = text_to_children(item)
+        list_items.append(ParentNode("li", children))
+    parent_node = ParentNode(tag="ul", children=list_items)
     return parent_node
 
 def markdown_to_html_node(markdown):

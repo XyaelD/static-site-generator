@@ -39,7 +39,7 @@ def text_node_to_html_node(text_node: TextNode):
     elif text_node.text_type == text_type_link:
         return LeafNode(tag="a", value=text_node.text, props={"href": text_node.url})
     elif text_node.text_type == text_type_image:
-        return LeafNode(tag="img", value=None, props={"src": text_node.url, "alt": text_node.text}) 
+        return LeafNode(tag="img", value="", props={"src": text_node.url, "alt": text_node.text}) 
     raise Exception("Not a valid type of TextNode")
 
 def split_nodes_delimiter(old_nodes: list[TextNode], delimiter, text_type):
